@@ -1,6 +1,7 @@
 # Barbershop — Sistema de Gestión para Barbería
 
 Proyecto integrador de **Administración de Bases de Datos**
+
 Universidad Técnica Estatal de Quevedo · Ingeniería de Software · Quinto nivel, Paralelo A
 
 **Docente:** Ing. Cordero Bazurto José Steven
