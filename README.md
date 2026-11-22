@@ -1,48 +1,98 @@
-# Barbershop — Sistema de Gestión para Barbería
+# Barbershop V1.1 — Sistema de gestión para barbería
 
-Proyecto integrador de **Administración de Bases de Datos**
+Repositorio: https://github.com/ramaguas-ship-it/Barbershop
 
-Universidad Técnica Estatal de Quevedo · Ingeniería de Software · Quinto nivel, Paralelo A
-
-**Docente:** Ing. Cordero Bazurto José Steven
-
-## Descripción
-
-Barbershop es una aplicación web para una barbería de una sola sucursal que centraliza la gestión de citas, clientes, cobros (incluido el pago en línea), caja, inventario y reportes de ventas.
-
-**Problema que resuelve:** la agenda en cuaderno o mensajes provoca cruces de horario, citas olvidadas y clientes que no asisten; además, el inventario, los cobros y las ventas se controlan a mano, lo que genera errores y falta de información para decidir.
-
-**Regla fundamental:** no se permite reservar un horario ocupado para el mismo barbero, y si una cita ya fue pagada en línea, el sistema bloquea cualquier intento de cobrarla de nuevo.
-
-**Estado:** etapa de especificación de requisitos. Aún no hay código implementado.
-
-## Integrantes
-
-- Amagua Sacon Robyn Willian
-- Barrionuevo Fuentes Carlos Daniel
-- Marcillo Ponce Alberto Jeanpool
-- Mesias Quijije Jhon Alexander
-- Vera Gomez Anthony Alfredo
-
-## Alcance
-
-**Incluye:** una sola sucursal, gestión de citas, servicios, clientes, inventario, cobros (efectivo, transferencia, tarjeta en local y pago en línea), caja y reportes.
-
-**Excluye:** comisiones, multisucursal, aplicación móvil nativa y programa de fidelización.
-
-### Módulos principales y funcionalidades previstas
-
-| Módulo | Funcionalidades | Versión |
-|---|---|---|
-| Autenticación y catálogo | Registro del cliente, inicio de sesión con acceso por roles (administrador, barbero, cliente), gestión de barberos y servicios | V1 |
-| Citas y agenda | Reserva de citas con validación de disponibilidad, agenda del barbero y cambio de estado de la cita | V1 |
-| Inventario | Gestión de productos, proveedores e ingresos de stock | V1 |
-| Cobros y pagos | Pago en línea mediante pasarela, cobro de atenciones y productos, descuento automático de stock con alerta de mínimo | V1 |
-| Gestión de citas complementaria e historial | Reprogramar o cancelar citas, historial de servicios y pagos del cliente | V2 |
-| Caja y reportes | Apertura y cierre de caja, reportes de ventas por período, barbero y método de pago, exportación a PDF | V2 |
+Aplicación web para gestionar citas, servicios y barberos de una barbería, con **PostgreSQL** como gestor de base de datos.
+Proyecto integrador de *Administración de Bases de Datos* (UTEQ, Ingeniería de Software, quinto nivel «A»).
 
 ## Tecnologías
 
-- Base de datos: PostgreSQL
-- Interfaz y lógica de negocio: por definir
-- Documentación: LaTeX
+| Capa | Tecnología |
+|---|---|
+| Base de datos | PostgreSQL 18 (contenedor Docker `postgres_abd`); extensión `btree_gist` |
+| Servidor | Node.js ≥ 20 + Express 5 |
+| Acceso a datos | `pg` (node-postgres) con **consultas parametrizadas** (sin concatenar SQL) |
+| Vistas | EJS (renderizado en servidor), CSS responsivo |
+| Seguridad | `bcryptjs` (hash de contraseñas), sesiones en PostgreSQL, token CSRF, bloqueo por intentos fallidos |
+
+## Requisitos implementados (primera versión funcional)
+
+| Requisito | Funcionalidad | Dónde verlo |
+|---|---|---|
+| RF-01 | Registro de cliente y perfil | `/registro`, `/perfil` |
+| RF-02 | Inicio de sesión y acceso por rol | `/login` |
+| RF-03 | CRUD de servicios y barberos (alta, edición, desactivar, eliminar) | `/admin/servicios`, `/admin/barberos` |
+| RF-04 | Reservar cita con los datos del perfil | `/citas/nueva` |
+| RF-05 | Validación de disponibilidad sin cruces | restricción `ex_citas_sin_cruce` en `db/01_schema.sql` |
+| RF-06 | Reprogramar y cancelar citas pendientes | `/citas` |
+| RF-07 | Agenda del barbero y cambio de estado | `/agenda` |
+
+El resto de requisitos de la matriz de la semana 2 sigue pendiente; ver el estado en el informe (`informe/`).
+
+## Puesta en marcha
+
+### 1. Base de datos
+
+Con el contenedor del manual de Docker del equipo (`postgres_abd`), cree la base y aplique los scripts:
+
+```bash
+docker exec -it postgres_abd psql -U admin_abd -d postgres -c "CREATE DATABASE barbershop;"
+```
+
+Si todavía no tiene el contenedor: `POSTGRES_PASSWORD=<clave> docker compose up -d` (usa `docker-compose.yml`, que crea la base `barbershop`).
+
+### 2. Aplicación
+
+```bash
+npm install
+cp .env.example .env        # edite DATABASE_URL (usuario, clave, puerto) y SESSION_SECRET
+npm run db:init             # aplica db/01_schema.sql y db/02_seed.sql (datos de demostración)
+npm start                   # http://localhost:3000
+```
+
+Sin datos de demostración: `node scripts/init-db.js --sin-semilla`.
+También se pueden ejecutar los scripts a mano desde DBeaver o `psql`: `db/01_schema.sql` y luego `db/02_seed.sql`
+(en este último reemplace `__HASH__` por un hash bcrypt, o use `npm run db:init`).
+
+### Usuarios de demostración (contraseña `Barber2026!`)
+
+| Rol | Correo |
+|---|---|
+| Administrador | admin@barbershop.test |
+| Barbero | luis@barbershop.test · marco@barbershop.test |
+| Cliente | cliente@barbershop.test (o regístrese en `/registro`) |
+
+### 3. Pruebas funcionales
+
+```bash
+npm test                    # usa DATABASE_URL; escribe tests/resultados.md
+node tests/run_tests.js --limpiar   # además borra los datos de prueba al terminar
+```
+
+Las pruebas arrancan la aplicación, ejecutan 22 casos por HTTP y verifican el efecto en PostgreSQL
+(incluye 20 reservas simultáneas del mismo horario). Las filas de prueba usan el dominio `@pruebas.test`.
+
+## Estructura
+
+```
+db/                 01_schema.sql (tablas, restricciones, triggers de auditoría) · 02_seed.sql
+src/                app.js · config.js · db.js · services.js · routes/ · middleware/ · views/
+public/             estilos.css
+scripts/init-db.js  aplica los scripts SQL
+tests/              run_tests.js · resultados.md (última ejecución)
+informe/            informe_semana3.tex y evidencias
+```
+
+## Decisiones técnicas relevantes
+
+- **Sin cruces de citas en la base de datos:** `EXCLUDE USING gist (barbero_id WITH =, tstzrange(inicio, fin) WITH &&) WHERE (estado NOT IN ('cancelada','ausente'))`. Cubre RN-01, RN-13 y RNF-13 aunque lleguen solicitudes simultáneas.
+- **Sin eliminación con historial (RN-12):** las claves foráneas son `ON DELETE RESTRICT`; la interfaz sugiere desactivar.
+- **Auditoría (RNF-08):** triggers registran usuario, fecha y valor anterior en cambios de precio y cancelaciones.
+- **Zona horaria:** los horarios se guardan en `timestamptz` y se interpretan en `America/Guayaquil`.
+
+## Limitaciones de esta versión
+
+- Horario de atención global (`HORA_APERTURA`/`HORA_CIERRE`), no por barbero (RF-19 pendiente).
+- Sin pago en línea, cobros, caja, inventario, cola de turnos ni correos (RF-08 y siguientes).
+- Una cita pagada no se puede modificar hasta implementar devoluciones (RF-68).
+- Falta recuperación de contraseña (parte de RNF-20). HTTPS no está configurado en desarrollo (`COOKIE_SECURE=true` al desplegar detrás de HTTPS).
