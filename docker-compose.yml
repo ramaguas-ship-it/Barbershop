@@ -1,0 +1,17 @@
+# Servidor PostgreSQL para Barbershop (misma version que el manual de Docker del equipo).
+services:
+  postgres:
+    image: postgres:18
+    container_name: postgres_abd
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: admin_abd
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD}
+      POSTGRES_DB: barbershop
+    ports:
+      - "5432:5432"
+    volumes:
+      # En la imagen 18 el volumen se monta en /var/lib/postgresql
+      - pgdata_abd:/var/lib/postgresql
+volumes:
+  pgdata_abd:
