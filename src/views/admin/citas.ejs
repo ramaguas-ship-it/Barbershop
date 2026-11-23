@@ -1,0 +1,15 @@
+<%- include('../partials/header', { titulo: 'Citas' }) %>
+<h1>Citas (últimas 100)</h1>
+<div class="table-wrap"><table>
+  <thead><tr><th>Fecha</th><th>Cliente</th><th>Barbero</th><th>Servicio</th><th>Estado</th><th></th></tr></thead>
+  <tbody>
+  <% citas.forEach(c => { %>
+    <tr><td><%= fechaHora(c.inicio) %></td><td><%= c.cliente %></td><td><%= c.barbero %></td><td><%= c.servicio %></td><td><span class="badge <%= c.estado %>"><%= ESTADOS[c.estado] %></span></td>
+    <td><% if (['pendiente','confirmada','en_espera'].includes(c.estado)) { %>
+      <form method="post" action="/agenda/<%= c.id %>/estado" class="inline" onsubmit="return confirm('¿Cancelar esta cita?')"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="estado" value="cancelada"><button class="link peligro">Cancelar</button></form>
+    <% } %></td></tr>
+  <% }) %>
+  <% if (!citas.length) { %><tr><td colspan="6">No hay citas registradas.</td></tr><% } %>
+  </tbody>
+</table></div>
+<%- include('../partials/footer') %>
