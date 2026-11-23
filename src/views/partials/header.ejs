@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= typeof titulo !== 'undefined' ? titulo + ' · ' : '' %>Barbershop</title>
+  <link rel="stylesheet" href="/estilos.css">
+</head>
+<body>
+<header class="top">
+  <a class="marca" href="/">✂ Barbershop</a>
+  <% if (typeof user !== 'undefined' && user) { %>
+  <nav>
+    <% if (user.rol === 'cliente') { %><a href="/citas">Mis citas</a><a href="/citas/nueva">Reservar</a><% } %>
+    <% if (user.rol === 'barbero') { %><a href="/agenda">Mi agenda</a><% } %>
+    <% if (user.rol === 'administrador') { %><a href="/admin/servicios">Servicios</a><a href="/admin/barberos">Barberos</a><a href="/admin/citas">Citas</a><% } %>
+    <a href="/perfil">Mi perfil</a>
+    <form method="post" action="/logout" class="inline"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="link">Salir (<%= user.nombre.split(' ')[0] %>)</button></form>
+  </nav>
+  <% } %>
+</header>
+<main>
+<% if (typeof flash !== 'undefined' && flash) { %><div class="flash <%= flash.tipo %>" role="status"><%= flash.texto %></div><% } %>

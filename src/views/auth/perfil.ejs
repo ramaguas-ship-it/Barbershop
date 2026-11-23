@@ -1,0 +1,14 @@
+<%- include('../partials/header', { titulo: 'Mi perfil' }) %>
+<section class="card narrow">
+  <h1>Mi perfil</h1>
+  <%- include('../partials/errores', { errores }) %>
+  <form method="post" action="/perfil">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <label>Correo <input value="<%= p.correo %>" disabled></label>
+    <label>Rol <input value="<%= p.rol %>" disabled></label>
+    <label>Nombre <input name="nombre" required minlength="3" maxlength="100" value="<%= p.nombre %>"></label>
+    <label>Teléfono <input name="telefono" required pattern="[0-9+]{7,15}" value="<%= p.telefono %>"></label>
+    <button>Guardar cambios</button>
+  </form>
+</section>
+<%- include('../partials/footer') %>

@@ -1,0 +1,16 @@
+<%- include('../partials/header', { titulo: 'Registro' }) %>
+<section class="card narrow">
+  <h1>Registro de cliente</h1>
+  <%- include('../partials/errores', { errores }) %>
+  <form method="post" action="/registro">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <label>Nombre completo <input name="nombre" required minlength="3" maxlength="100" value="<%= datos.nombre || '' %>"></label>
+    <label>Teléfono <input name="telefono" required inputmode="tel" pattern="[0-9+]{7,15}" value="<%= datos.telefono || '' %>"></label>
+    <label>Correo <input type="email" name="correo" required maxlength="120" value="<%= datos.correo || '' %>"></label>
+    <label>Contraseña <input type="password" name="password" required minlength="8" autocomplete="new-password"><small>Mínimo 8 caracteres, con letras y números.</small></label>
+    <label class="check"><input type="checkbox" name="consentimiento" value="1" required> Acepto el tratamiento de mis datos personales para gestionar mis citas.</label>
+    <button>Crear cuenta</button>
+  </form>
+  <p>¿Ya tiene cuenta? <a href="/login">Inicie sesión</a>.</p>
+</section>
+<%- include('../partials/footer') %>
