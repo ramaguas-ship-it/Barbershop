@@ -1,0 +1,30 @@
+<%- include('../partials/header', { titulo: 'Barberos' }) %>
+<h1>Barberos</h1>
+<%- include('../partials/errores', { errores }) %>
+<section class="card">
+  <h2>Nuevo barbero</h2>
+  <form method="post" action="/admin/barberos" class="row">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <label>Nombre <input name="nombre" required minlength="3" maxlength="100" value="<%= datos.nombre || '' %>"></label>
+    <label>Teléfono <input name="telefono" required pattern="[0-9+]{7,15}" value="<%= datos.telefono || '' %>"></label>
+    <label>Correo <input type="email" name="correo" required value="<%= datos.correo || '' %>"></label>
+    <label>Contraseña inicial <input type="password" name="password" required minlength="8" autocomplete="new-password"></label>
+    <button>Registrar</button>
+  </form>
+</section>
+<div class="table-wrap"><table>
+  <thead><tr><th>Barbero</th><th>Teléfono</th><th>Correo</th><th>Estado</th><th>Acciones</th></tr></thead>
+  <tbody>
+  <% barberos.forEach(b => { %>
+    <tr class="<%= b.activo ? '' : 'inactivo' %>">
+      <td><%= b.nombre %></td><td><%= b.telefono %></td><td><%= b.correo %></td><td><%= b.activo ? 'Activo' : 'Inactivo' %></td>
+      <td class="acciones">
+        <a href="/admin/barberos/<%= b.id %>/editar">Editar</a>
+        <form method="post" action="/admin/barberos/<%= b.id %>/estado" class="inline"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="link"><%= b.activo ? 'Desactivar' : 'Activar' %></button></form>
+        <form method="post" action="/admin/barberos/<%= b.id %>/eliminar" class="inline" onsubmit="return confirm('¿Eliminar este barbero?')"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="link peligro">Eliminar</button></form>
+      </td>
+    </tr>
+  <% }) %>
+  </tbody>
+</table></div>
+<%- include('../partials/footer') %>
