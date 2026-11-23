@@ -1,0 +1,20 @@
+<%- include('../partials/header', { titulo: 'Mis citas' }) %>
+<h1>Mis citas</h1>
+<p><a class="btn" href="/citas/nueva">Reservar nueva cita</a></p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Fecha y hora</th><th>Servicio</th><th>Barbero</th><th>Precio</th><th>Estado</th><th>Acciones</th></tr></thead>
+  <tbody>
+  <% citas.forEach(c => { %>
+    <tr><td><%= fechaHora(c.inicio) %></td><td><%= c.servicio %></td><td><%= c.barbero %></td><td><%= dinero(c.precio) %></td>
+      <td><span class="badge <%= c.estado %>"><%= ESTADOS[c.estado] %></span></td>
+      <td class="acciones">
+        <% if (c.modificable) { %>
+          <a href="/citas/<%= c.id %>/reprogramar">Reprogramar</a>
+          <form method="post" action="/citas/<%= c.id %>/cancelar" class="inline" onsubmit="return confirm('¿Cancelar esta cita?')"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="link peligro">Cancelar</button></form>
+        <% } else if (c.estado === 'pendiente') { %><small>Fuera del plazo de <%= plazo %> h</small><% } %>
+      </td></tr>
+  <% }) %>
+  <% if (!citas.length) { %><tr><td colspan="6">Aún no tiene citas.</td></tr><% } %>
+  </tbody>
+</table></div>
+<%- include('../partials/footer') %>

@@ -1,0 +1,22 @@
+<%- include('../partials/header', { titulo: 'Reprogramar cita' }) %>
+<section class="card">
+  <h1>Reprogramar cita</h1>
+  <p>Actual: <strong><%= fechaHora(c.inicio) %></strong> · <%= c.servicio %> con <%= c.barbero %></p>
+  <form method="get" action="/citas/<%= c.id %>/reprogramar" class="row">
+    <label>Nueva fecha <input type="date" name="fecha" required min="<%= hoy %>" value="<%= fecha %>"></label>
+    <button>Ver horarios libres</button>
+  </form>
+</section>
+<% if (libres !== null) { %>
+<section class="card">
+  <h2>Horarios libres</h2>
+  <% if (!libres.length) { %><p>No hay horarios libres en esa fecha.</p><% } else { %>
+  <form method="post" action="/citas/<%= c.id %>/reprogramar">
+    <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="fecha" value="<%= fecha %>">
+    <div class="slots"><% libres.forEach(h => { %><label class="slot"><input type="radio" name="hora" value="<%= h %>" required><span><%= h %></span></label><% }) %></div>
+    <button>Confirmar cambio</button>
+  </form><% } %>
+</section>
+<% } %>
+<p><a href="/citas">← Volver a mis citas</a></p>
+<%- include('../partials/footer') %>

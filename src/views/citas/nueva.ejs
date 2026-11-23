@@ -1,0 +1,32 @@
+<%- include('../partials/header', { titulo: 'Reservar cita' }) %>
+<section class="card">
+  <h1>Reservar cita</h1>
+  <p class="nota">Sus datos de contacto se toman de su perfil; no necesita ingresarlos de nuevo.</p>
+  <form method="get" action="/citas/nueva" class="row">
+    <label>Barbero
+      <select name="barbero_id" required><option value="">Seleccione…</option>
+        <% barberos.forEach(b => { %><option value="<%= b.id %>" <%= String(sel.barbero_id) === String(b.id) ? 'selected' : '' %>><%= b.nombre %></option><% }) %></select></label>
+    <label>Servicio
+      <select name="servicio_id" required><option value="">Seleccione…</option>
+        <% servicios.forEach(s => { %><option value="<%= s.id %>" <%= String(sel.servicio_id) === String(s.id) ? 'selected' : '' %>><%= s.nombre %> · <%= s.duracion_min %> min · <%= dinero(s.precio) %></option><% }) %></select></label>
+    <label>Fecha <input type="date" name="fecha" required min="<%= hoy %>" value="<%= sel.fecha %>"></label>
+    <button>Ver horarios libres</button>
+  </form>
+</section>
+<% if (libres !== null) { %>
+<section class="card">
+  <h2>Horarios libres</h2>
+  <% if (!libres.length) { %><p>No hay horarios libres para esa combinación. Pruebe otra fecha o barbero.</p>
+  <% } else { %>
+  <form method="post" action="/citas">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <input type="hidden" name="barbero_id" value="<%= sel.barbero_id %>">
+    <input type="hidden" name="servicio_id" value="<%= sel.servicio_id %>">
+    <input type="hidden" name="fecha" value="<%= sel.fecha %>">
+    <div class="slots"><% libres.forEach((h, i) => { %><label class="slot"><input type="radio" name="hora" value="<%= h %>" required <%= i === 0 ? '' : '' %>><span><%= h %></span></label><% }) %></div>
+    <button>Confirmar reserva</button>
+  </form>
+  <% } %>
+</section>
+<% } %>
+<%- include('../partials/footer') %>

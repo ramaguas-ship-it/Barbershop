@@ -1,0 +1,19 @@
+<%- include('../partials/header', { titulo: 'Mi agenda' }) %>
+<h1>Mi agenda</h1>
+<form method="get" action="/agenda" class="row"><label>Fecha <input type="date" name="fecha" value="<%= fecha %>"></label><button>Ver</button></form>
+<div class="table-wrap"><table>
+  <thead><tr><th>Hora</th><th>Cliente</th><th>Teléfono</th><th>Servicio</th><th>Estado</th><th>Cambiar a</th></tr></thead>
+  <tbody>
+  <% citas.forEach(c => { %>
+    <tr><td><%= hora(c.inicio) %> – <%= hora(c.fin) %></td><td><%= c.cliente %></td><td><%= c.telefono %></td><td><%= c.servicio %></td>
+      <td><span class="badge <%= c.estado %>"><%= ESTADOS[c.estado] %></span></td>
+      <td class="acciones">
+        <% TRANSICIONES[c.estado].forEach(est => { %>
+          <form method="post" action="/agenda/<%= c.id %>/estado" class="inline"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="estado" value="<%= est %>"><button class="link"><%= ESTADOS[est] %></button></form>
+        <% }) %>
+      </td></tr>
+  <% }) %>
+  <% if (!citas.length) { %><tr><td colspan="6">No tiene citas en esta fecha.</td></tr><% } %>
+  </tbody>
+</table></div>
+<%- include('../partials/footer') %>
