@@ -1,0 +1,13 @@
+<%- include('../partials/header', { titulo: 'Editar barbero' }) %>
+<section class="card narrow">
+  <h1>Editar barbero</h1>
+  <%- include('../partials/errores', { errores }) %>
+  <form method="post" action="/admin/barberos/<%= b.id %>">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <label>Correo <input value="<%= b.correo || '' %>" disabled></label>
+    <label>Nombre <input name="nombre" required minlength="3" maxlength="100" value="<%= b.nombre %>"></label>
+    <label>Teléfono <input name="telefono" required pattern="[0-9+]{7,15}" value="<%= b.telefono %>"></label>
+    <button>Guardar</button> <a href="/admin/barberos">Cancelar</a>
+  </form>
+</section>
+<%- include('../partials/footer') %>
