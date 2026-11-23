@@ -1,0 +1,30 @@
+<%- include('../partials/header', { titulo: 'Servicios' }) %>
+<h1>Servicios</h1>
+<%- include('../partials/errores', { errores }) %>
+<section class="card">
+  <h2>Nuevo servicio</h2>
+  <form method="post" action="/admin/servicios" class="row">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <label>Nombre <input name="nombre" required minlength="3" maxlength="80" value="<%= datos.nombre || '' %>"></label>
+    <label>Duración (min) <input type="number" name="duracion_min" required min="5" max="480" step="5" value="<%= datos.duracion_min || '' %>"></label>
+    <label>Precio (USD) <input type="number" name="precio" required min="0" max="9999.99" step="0.01" value="<%= datos.precio || '' %>"></label>
+    <button>Registrar</button>
+  </form>
+</section>
+<div class="table-wrap"><table>
+  <thead><tr><th>Servicio</th><th>Duración</th><th>Precio</th><th>Estado</th><th>Acciones</th></tr></thead>
+  <tbody>
+  <% servicios.forEach(s => { %>
+    <tr class="<%= s.activo ? '' : 'inactivo' %>">
+      <td><%= s.nombre %></td><td><%= s.duracion_min %> min</td><td><%= dinero(s.precio) %></td>
+      <td><%= s.activo ? 'Activo' : 'Inactivo' %></td>
+      <td class="acciones">
+        <a href="/admin/servicios/<%= s.id %>/editar">Editar</a>
+        <form method="post" action="/admin/servicios/<%= s.id %>/estado" class="inline"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="link"><%= s.activo ? 'Desactivar' : 'Activar' %></button></form>
+        <form method="post" action="/admin/servicios/<%= s.id %>/eliminar" class="inline" onsubmit="return confirm('¿Eliminar este servicio?')"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="link peligro">Eliminar</button></form>
+      </td>
+    </tr>
+  <% }) %>
+  </tbody>
+</table></div>
+<%- include('../partials/footer') %>
